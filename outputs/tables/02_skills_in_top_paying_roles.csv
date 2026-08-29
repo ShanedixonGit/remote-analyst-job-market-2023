@@ -1,0 +1,16 @@
+skill,postings,coverage_pct
+sql,8,100.0
+python,7,87.5
+tableau,6,75.0
+r,4,50.0
+excel,3,37.5
+pandas,3,37.5
+snowflake,3,37.5
+atlassian,2,25.0
+aws,2,25.0
+azure,2,25.0
+bitbucket,2,25.0
+confluence,2,25.0
+gitlab,2,25.0
+go,2,25.0
+jira,2,25.0

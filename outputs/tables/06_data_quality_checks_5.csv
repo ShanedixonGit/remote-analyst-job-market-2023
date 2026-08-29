@@ -1,0 +1,11 @@
+skill,postings,avg_salary
+pyspark,2,208172.0
+bitbucket,2,189155.0
+couchbase,1,160515.0
+watson,1,160515.0
+datarobot,1,155486.0
+gitlab,3,154500.0
+swift,2,153750.0
+jupyter,3,152777.0
+pandas,9,151821.0
+elasticsearch,1,145000.0
