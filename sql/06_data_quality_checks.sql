@@ -122,3 +122,35 @@ FROM top_paying_jobs AS t
 LEFT JOIN skills_job_dim AS sj ON sj.job_id = t.job_id
 GROUP BY t.job_id, t.job_title, t.salary_year_avg
 ORDER BY t.salary_year_avg DESC;
+
+-- CHECK: near-duplicate postings. Groups of postings that share title, company,
+-- location, board and timestamp, and how many of those groups disagree on the
+-- skills extracted. Disagreeing groups are kept, since dropping any copy would
+-- discard skill data.
+WITH posting_skills AS (
+    SELECT
+        f.job_id,
+        f.job_title,
+        f.company_id,
+        f.job_location,
+        f.job_via,
+        f.job_posted_date,
+        COALESCE(STRING_AGG(CAST(sj.skill_id AS VARCHAR), ',' ORDER BY sj.skill_id), '') AS skill_set
+    FROM job_postings_fact AS f
+    LEFT JOIN skills_job_dim AS sj ON sj.job_id = f.job_id
+    GROUP BY f.job_id, f.job_title, f.company_id, f.job_location, f.job_via, f.job_posted_date
+),
+near_duplicate_groups AS (
+    SELECT
+        COUNT(*) AS postings,
+        COUNT(DISTINCT skill_set) AS distinct_skill_sets
+    FROM posting_skills
+    GROUP BY job_title, company_id, job_location, job_via, job_posted_date
+    HAVING COUNT(*) > 1
+)
+SELECT
+    COUNT(*) AS near_duplicate_groups,
+    SUM(postings) AS near_duplicate_postings,
+    COUNT(*) FILTER (WHERE distinct_skill_sets > 1) AS groups_with_differing_skills,
+    SUM(postings) FILTER (WHERE distinct_skill_sets > 1) AS postings_with_differing_skills
+FROM near_duplicate_groups;

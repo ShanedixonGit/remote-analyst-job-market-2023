@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Data-quality check 7 counts near-duplicate postings and how many disagree on extracted skills, so the README's near-duplicate figures can be reproduced from a query.
+
 ### Fixed
 - Chart 03 title said four skills appear in "at least a third" of postings; Tableau is at 32.5%, so it now says "at least 30%", the threshold the chart actually uses.
 - Chart 06 no longer says the live sample was "collected today", and reads the 2023 sample size from the data instead of a hardcoded 11,496.
