@@ -231,7 +231,7 @@ def chart_in_demand_skills() -> None:
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x / 1000:,.0f}k"))
     frame(
         ax,
-        f"{spelled} skills appear in at least a third of remote analyst postings",
+        f"{spelled} skills appear in at least 30% of remote analyst postings",
         f"Share of the {population('data analyst, remote, with skills'):,} remote Data"
         " Analyst postings that record any skill.\nNo salary filter: this measures how"
         " often a skill is asked for, not what it pays.",
@@ -357,6 +357,7 @@ def chart_live_comparison() -> None:
 
     live = pd.read_csv(source)
     baseline = pd.read_csv(TABLES / "07_skill_demand_all.csv")
+    base_n = population("data analyst, remote, with skills")
     live_n = int(
         pd.read_csv(LIVE_TABLES / "06_data_quality_checks_1.csv")
         .set_index("step")
@@ -385,7 +386,7 @@ def chart_live_comparison() -> None:
     fig, ax = plt.subplots(figsize=(10.5, 6.5))
     ax.barh(
         [p + height / 2 for p in positions], merged["share_of_pct_2023"],
-        height=height, color=ACCENT, label="2023 dataset (n=11,496)",
+        height=height, color=ACCENT, label=f"2023 dataset (n={base_n:,})",
     )
     ax.barh(
         [p - height / 2 for p in positions], merged["share_of_pct_live"],
@@ -410,8 +411,8 @@ def chart_live_comparison() -> None:
     frame(
         ax,
         "SQL leads in both datasets; the live sample is too small to rank the rest",
-        f"Share of remote analyst postings listing each skill: {live_n} collected today"
-        f" against 11,496 from 2023.\nDifferences below roughly 15 points are noise at"
+        f"Share of remote analyst postings listing each skill: {live_n} in the live sample"
+        f" against {base_n:,} from 2023.\nDifferences below roughly 15 points are noise at"
         f" this sample size. Excludes {', '.join(excluded)}, which the\nlive keyword"
         " extractor cannot separate from ordinary words.",
         "Share of postings listing the skill",
