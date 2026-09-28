@@ -6,7 +6,7 @@ defined in sql/00_schema.sql, generating deterministic surrogate keys so that
 repeated runs produce identical ids.
 
 Usage:
-    python scripts/build_database.py [--refresh]
+    python scripts/build_database.py [--refresh] [--export-csv]
 """
 
 import argparse
@@ -110,6 +110,8 @@ def load(export_csv: bool = False) -> None:
         """
     )
 
+    # The inner join to company_dim drops postings with no company name. In the
+    # 2023 snapshot that is one empty row with no title, skills or salary.
     con.execute(
         """
         INSERT INTO job_postings_fact
@@ -145,6 +147,17 @@ def load(export_csv: bool = False) -> None:
         """
     )
 
+    source_rows, staged_rows, no_company = con.execute(
+        f"""
+        SELECT
+            (SELECT COUNT(*) FROM read_csv('{SOURCE_CSV}', header = true, sample_size = -1)),
+            (SELECT COUNT(*) FROM staged),
+            (SELECT COUNT(*) FROM staged WHERE company_name IS NULL)
+        """
+    ).fetchone()
+    print(f"{'source rows':<20} {source_rows:>10,}")
+    print(f"{'duplicates removed':<20} {source_rows - staged_rows:>10,}")
+    print(f"{'no company, dropped':<20} {no_company:>10,}")
     for table in ("company_dim", "skills_dim", "job_postings_fact", "skills_job_dim"):
         rows = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
         print(f"{table:<20} {rows:>10,}")
